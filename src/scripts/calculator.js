@@ -43,6 +43,11 @@ export class Calculator {
                 return 'Error';
             }
 
+            // Validate syntax (before preprocessing)
+            if (!this.validateSyntax(expr)) {
+                return 'Error';
+            }
+
             // Preprocess expression: convert symbols
             const processedExpr = this.preprocessExpression(expr);
 
@@ -93,6 +98,62 @@ export class Calculator {
         }
 
         return depth === 0;
+    }
+
+    /**
+     * Validates expression syntax for invalid operator patterns
+     * @param {string} expr - Expression to validate
+     * @returns {boolean} True if syntax is valid
+     * @private
+     */
+    validateSyntax(expr) {
+        // Define operators (including unicode symbols)
+        const operators = ['+', '-', '*', '/', '×', '÷', '^'];
+
+        // Check for double operators (e.g., "2 + + 3")
+        for (let i = 0; i < expr.length - 1; i++) {
+            const current = expr[i];
+            const next = expr[i + 1];
+
+            // Skip if current is not an operator
+            if (!operators.includes(current)) continue;
+
+            // Look for next non-space character
+            let j = i + 1;
+            while (j < expr.length && expr[j] === ' ') {
+                j++;
+            }
+
+            if (j < expr.length) {
+                const nextNonSpace = expr[j];
+                // If next non-space is also an operator (except minus for negative numbers)
+                if (operators.includes(nextNonSpace)) {
+                    // Allow "operator followed by minus" for negative numbers (e.g., "2 * -3")
+                    // But disallow "operator followed by other operators" (e.g., "2 + + 3")
+                    if (nextNonSpace !== '-') {
+                        return false;
+                    }
+                    // Also disallow "minus followed by minus" (e.g., "2 - - 3")
+                    if (current === '-' && nextNonSpace === '-') {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // Check for leading operator (except minus for negative numbers)
+        const firstNonSpace = expr.trim()[0];
+        if (operators.includes(firstNonSpace) && firstNonSpace !== '-') {
+            return false;
+        }
+
+        // Check for trailing operator
+        const lastNonSpace = expr.trim()[expr.trim().length - 1];
+        if (operators.includes(lastNonSpace)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
