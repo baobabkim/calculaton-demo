@@ -37,6 +37,11 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+      
+      - name: Copy standalone calculator
+        run: |
+          mkdir -p dist
+          cp calculator-standalone.html dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
