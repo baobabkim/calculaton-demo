@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scientific Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1c222e",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'inner-light': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Hide scrollbar for clean UI but allow scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Tap highlight removal for mobile feel */
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Keypad press effect */
+        button:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased h-screen w-full overflow-hidden flex flex-col select-none">
+<!-- Header Section -->
+<header class="flex items-center justify-between px-4 py-3 z-10">
+<button aria-label="History" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+<span class="material-symbols-outlined" style="font-size: 24px;">history</span>
+</button>
+<!-- Mode Toggle / Title -->
+<div class="flex bg-gray-200 dark:bg-surface-dark rounded-lg p-1">
+<button class="px-3 py-1 bg-white dark:bg-gray-600 rounded text-xs font-bold text-gray-900 dark:text-white shadow-sm">DEG</button>
+<button class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">RAD</button>
+</div>
+<button aria-label="Settings" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+<span class="material-symbols-outlined" style="font-size: 24px;">settings</span>
+</button>
+</header>
+<!-- Display Area -->
+<section class="flex-1 flex flex-col justify-end px-6 pb-6 pt-2 w-full text-right relative overflow-hidden">
+<!-- Input Equation -->
+<div class="text-gray-500 dark:text-gray-400 text-lg mb-1 tracking-wide font-normal truncate opacity-80">
+            12 + (35 × sin(45))
+        </div>
+<!-- Result -->
+<div class="text-gray-900 dark:text-white text-6xl font-bold tracking-tight leading-none break-all">
+            36.74
+        </div>
+</section>
+<!-- Controls Area -->
+<section class="w-full bg-white dark:bg-[#0c1018] rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-20 flex flex-col pb-safe">
+<!-- Drag Handle / Divider -->
+<div class="w-full flex justify-center pt-3 pb-1">
+<div class="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+</div>
+<!-- Keypad Container -->
+<div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 pt-2">
+<!-- Scientific Keys Grid (Compact) -->
+<div class="grid grid-cols-4 gap-3 mb-3">
+<!-- Row 1 -->
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">mc</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">m+</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">m-</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">mr</button>
+<!-- Row 2 -->
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">2nd</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">x²</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">x³</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">xʸ</button>
+<!-- Row 3 -->
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">1/x</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">√x</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">ln</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">log</button>
+<!-- Row 4 -->
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">sin</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">cos</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">tan</button>
+<button class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">e</button>
+</div>
+<div class="h-px w-full bg-gray-200 dark:bg-gray-800 mb-4"></div>
+<!-- Standard Keys Grid -->
+<div class="grid grid-cols-4 gap-3">
+<!-- Utility Row -->
+<button class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-red-500 dark:text-red-400 text-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">AC</button>
+<button class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-primary dark:text-primary-400 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">(</button>
+<button class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-primary dark:text-primary-400 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">)</button>
+<button class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">÷</button>
+<!-- 7 8 9 X -->
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">7</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">8</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">9</button>
+<button class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">×</button>
+<!-- 4 5 6 - -->
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">4</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">5</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">6</button>
+<button class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">-</button>
+<!-- 1 2 3 + -->
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">1</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">2</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">3</button>
+<button class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">+</button>
+<!-- 0 . Backspace = -->
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">0</button>
+<button class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">.</button>
+<button class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-gray-600 dark:text-gray-300 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 24px;">backspace</span>
+</button>
+<button class="h-16 rounded-xl bg-primary text-white text-3xl font-medium hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all active:scale-95">=</button>
+</div>
+</div>
+<!-- Bottom safe area spacer handled by pb-safe in parent if using iOS standards, or just padding -->
+<div class="h-6 w-full"></div>
+</section>
+</body></html>
