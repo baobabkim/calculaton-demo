@@ -6,6 +6,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen)](docs/TECH_SPEC.md)
 
+## 🎮 라이브 데모
+
+**지금 바로 사용해보세요!**
+
+🔗 **[계산기 실행하기](https://baobabkims.github.io/calculaton-demo/calculator-standalone.html)**
+
+- ✅ 빌드 없이 바로 실행 가능
+- ✅ 모든 기능 완전 작동
+- ✅ 모바일/데스크톱 모두 지원
+- ✅ 다크 모드 기본 적용
+
 ![Calculator Preview](docs/design/screen.png)
 
 ---
@@ -235,7 +246,12 @@ graph TD
 
 ### 💾 고급 기능
 - **메모리 기능**: mc, m+, m-, mr
-- **계산 히스토리**: 최근 50개 계산 내역 저장
+- **계산 히스토리**: 
+  - 최근 100개 계산 내역 자동 저장
+  - LocalStorage 영속성 (페이지 새로고침 후에도 유지)
+  - 히스토리 항목 클릭으로 수식 및 결과 재사용
+  - 개별/전체 삭제 기능
+  - 타임스탬프 표시 (방금 전, X분 전, X시간 전)
 - **다크/라이트 모드**: 사용자 선호에 맞는 테마
 - **키보드 지원**: 모든 기능을 키보드로 제어 가능
 
@@ -306,11 +322,20 @@ calculaton-demo/
 
 ## 🚀 시작하기
 
-### 사전 요구사항
+### 빠른 시작 (빌드 불필요)
+
+**가장 빠른 방법**: 브라우저에서 바로 실행
+
+1. `calculator-standalone.html` 파일을 브라우저에서 열기
+2. 또는 [라이브 데모](https://baobabkims.github.io/calculaton-demo/calculator-standalone.html) 접속
+
+### 개발 환경 설정
+
+#### 사전 요구사항
 - Node.js 18.x 이상
 - npm 9.x 이상
 
-### 설치 및 실행
+#### 설치 및 실행
 
 ```bash
 # 저장소 클론

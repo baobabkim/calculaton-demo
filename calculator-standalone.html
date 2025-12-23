@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공학용 전자계산기</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1c222e",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Tap highlight removal */
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Press effect */
+        button:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display antialiased h-screen w-full overflow-hidden flex flex-col select-none">
+
+    <!-- History Panel (Slide-in from left) -->
+    <div id="historyPanel"
+        class="fixed inset-y-0 left-0 w-80 bg-white dark:bg-[#0c1018] shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out z-50 flex flex-col">
+        <!-- History Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">계산 기록</h2>
+            <button onclick="app.closeHistory()"
+                class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+                <span class="material-symbols-outlined" style="font-size: 24px;">close</span>
+            </button>
+        </div>
+
+        <!-- History Content -->
+        <div id="historyContent" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- History items will be rendered here -->
+            <div id="emptyHistory" class="flex flex-col items-center justify-center h-full text-center">
+                <span class="material-symbols-outlined text-gray-300 dark:text-gray-700"
+                    style="font-size: 64px;">history</span>
+                <p class="text-gray-500 dark:text-gray-400 mt-4">계산 기록이 없습니다</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">계산을 시작하면 여기에 표시됩니다</p>
+            </div>
+        </div>
+
+        <!-- Clear All Button -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-800">
+            <button onclick="app.clearHistory()"
+                class="w-full py-3 rounded-xl bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400 font-medium hover:bg-red-500/20 dark:hover:bg-red-500/30 transition-colors">
+                전체 삭제
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay (when history is open) -->
+    <div id="historyOverlay"
+        class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 z-40"></div>
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-4 py-3 z-10">
+        <button onclick="app.openHistory()" aria-label="History"
+            class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+            <span class="material-symbols-outlined" style="font-size: 24px;">history</span>
+        </button>
+
+        <!-- DEG/RAD Toggle -->
+        <div class="flex bg-gray-200 dark:bg-surface-dark rounded-lg p-1">
+            <button id="degBtn"
+                class="px-3 py-1 bg-white dark:bg-gray-600 rounded text-xs font-bold text-gray-900 dark:text-white shadow-sm">DEG</button>
+            <button id="radBtn" class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">RAD</button>
+        </div>
+
+        <button aria-label="Settings"
+            class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+            <span class="material-symbols-outlined" style="font-size: 24px;">settings</span>
+        </button>
+    </header>
+
+    <!-- Display Area -->
+    <section class="flex-1 flex flex-col justify-end px-6 pb-6 pt-2 w-full text-right relative overflow-hidden">
+        <!-- Input Equation -->
+        <div id="expression"
+            class="text-gray-500 dark:text-gray-400 text-lg mb-1 tracking-wide font-normal truncate opacity-80">
+        </div>
+        <!-- Result -->
+        <div id="result" class="text-gray-900 dark:text-white text-6xl font-bold tracking-tight leading-none break-all">
+            0
+        </div>
+    </section>
+
+    <!-- Controls Area -->
+    <section
+        class="w-full bg-white dark:bg-[#0c1018] rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-20 flex flex-col pb-safe">
+        <!-- Drag Handle -->
+        <div class="w-full flex justify-center pt-3 pb-1">
+            <div class="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+        </div>
+
+        <!-- Keypad Container -->
+        <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 pt-2">
+            <!-- Scientific Keys Grid -->
+            <div class="grid grid-cols-4 gap-3 mb-3">
+                <!-- Row 1 -->
+                <button onclick="app.handleAction('mc')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">mc</button>
+                <button onclick="app.handleAction('m+')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">m+</button>
+                <button onclick="app.handleAction('m-')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">m-</button>
+                <button onclick="app.handleAction('mr')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">mr</button>
+
+                <!-- Row 2 -->
+                <button onclick="app.handleFunction('2nd')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">2nd</button>
+                <button onclick="app.handleFunction('square')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">x²</button>
+                <button onclick="app.handleFunction('cube')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">x³</button>
+                <button onclick="app.handleFunction('power')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">xʸ</button>
+
+                <!-- Row 3 -->
+                <button onclick="app.handleFunction('inverse')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">1/x</button>
+                <button onclick="app.handleFunction('sqrt')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">√x</button>
+                <button onclick="app.handleFunction('ln')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">ln</button>
+                <button onclick="app.handleFunction('log')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">log</button>
+
+                <!-- Row 4 -->
+                <button onclick="app.handleFunction('sin')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">sin</button>
+                <button onclick="app.handleFunction('cos')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">cos</button>
+                <button onclick="app.handleFunction('tan')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">tan</button>
+                <button onclick="app.appendNumber('e')"
+                    class="h-10 rounded-lg bg-background-light dark:bg-surface-dark text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">e</button>
+            </div>
+
+            <div class="h-px w-full bg-gray-200 dark:bg-gray-800 mb-4"></div>
+
+            <!-- Standard Keys Grid -->
+            <div class="grid grid-cols-4 gap-3">
+                <!-- Utility Row -->
+                <button onclick="app.clear()"
+                    class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-red-500 dark:text-red-400 text-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">AC</button>
+                <button onclick="app.appendNumber('(')"
+                    class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-primary dark:text-primary-400 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">(</button>
+                <button onclick="app.appendNumber(')')"
+                    class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-primary dark:text-primary-400 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">)</button>
+                <button onclick="app.appendOperator('/')"
+                    class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">÷</button>
+
+                <!-- 7 8 9 × -->
+                <button onclick="app.appendNumber('7')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">7</button>
+                <button onclick="app.appendNumber('8')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">8</button>
+                <button onclick="app.appendNumber('9')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">9</button>
+                <button onclick="app.appendOperator('*')"
+                    class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">×</button>
+
+                <!-- 4 5 6 - -->
+                <button onclick="app.appendNumber('4')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">4</button>
+                <button onclick="app.appendNumber('5')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">5</button>
+                <button onclick="app.appendNumber('6')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">6</button>
+                <button onclick="app.appendOperator('-')"
+                    class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">-</button>
+
+                <!-- 1 2 3 + -->
+                <button onclick="app.appendNumber('1')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">1</button>
+                <button onclick="app.appendNumber('2')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">2</button>
+                <button onclick="app.appendNumber('3')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">3</button>
+                <button onclick="app.appendOperator('+')"
+                    class="h-16 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 text-2xl font-medium hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">+</button>
+
+                <!-- 0 . Backspace = -->
+                <button onclick="app.appendNumber('0')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">0</button>
+                <button onclick="app.appendNumber('.')"
+                    class="h-16 rounded-xl bg-gray-50 dark:bg-[#1E232F] text-gray-900 dark:text-white text-2xl font-medium hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors shadow-sm dark:shadow-none">.</button>
+                <button onclick="app.backspace()"
+                    class="h-16 rounded-xl bg-gray-100 dark:bg-[#252A35] text-gray-600 dark:text-gray-300 text-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">backspace</span>
+                </button>
+                <button onclick="app.calculate()"
+                    class="h-16 rounded-xl bg-primary text-white text-3xl font-medium hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all active:scale-95">=</button>
+            </div>
+        </div>
+
+        <div class="h-6 w-full"></div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.3.0/math.min.js"></script>
+    <script>
+        // History Manager Class
+        class HistoryManager {
+            constructor() {
+                this.history = this.loadFromStorage();
+                this.maxItems = 100;
+            }
+
+            addEntry(expression, result) {
+                const entry = {
+                    id: Date.now(),
+                    expression,
+                    result,
+                    timestamp: new Date().toISOString()
+                };
+                this.history.unshift(entry);
+                if (this.history.length > this.maxItems) {
+                    this.history.pop();
+                }
+                this.saveToStorage();
+            }
+
+            getAll() {
+                return this.history;
+            }
+
+            deleteEntry(id) {
+                this.history = this.history.filter(entry => entry.id !== id);
+                this.saveToStorage();
+            }
+
+            clear() {
+                this.history = [];
+                this.saveToStorage();
+            }
+
+            loadFromStorage() {
+                try {
+                    const stored = localStorage.getItem('calculator_history');
+                    return stored ? JSON.parse(stored) : [];
+                } catch (error) {
+                    return [];
+                }
+            }
+
+            saveToStorage() {
+                try {
+                    localStorage.setItem('calculator_history', JSON.stringify(this.history));
+                } catch (error) {
+                    console.error('Failed to save history:', error);
+                }
+            }
+        }
+
+        // Calculator App Class
+        class CalculatorApp {
+            constructor() {
+                this.expression = '';
+                this.expressionEl = document.getElementById('expression');
+                this.resultEl = document.getElementById('result');
+                this.historyManager = new HistoryManager();
+                this.historyPanel = document.getElementById('historyPanel');
+                this.historyOverlay = document.getElementById('historyOverlay');
+                this.historyContent = document.getElementById('historyContent');
+
+                this.setupHistoryOverlay();
+            }
+
+            setupHistoryOverlay() {
+                this.historyOverlay.addEventListener('click', () => {
+                    this.closeHistory();
+                });
+            }
+
+            appendNumber(num) {
+                this.expression += num;
+                this.updateDisplay();
+            }
+
+            appendOperator(op) {
+                const opMap = {
+                    '*': ' × ',
+                    '/': ' ÷ ',
+                    '+': ' + ',
+                    '-': ' - '
+                };
+                this.expression += opMap[op] || ` ${op} `;
+                this.updateDisplay();
+            }
+
+            handleFunction(func) {
+                const funcMap = {
+                    'sin': 'sin(',
+                    'cos': 'cos(',
+                    'tan': 'tan(',
+                    'sqrt': 'sqrt(',
+                    'square': '^2',
+                    'cube': '^3',
+                    'power': '^',
+                    'ln': 'log(',
+                    'log': 'log10(',
+                    'inverse': '1/',
+                };
+                this.expression += funcMap[func] || func;
+                this.updateDisplay();
+            }
+
+            handleAction(action) {
+                // Memory functions - placeholder
+                console.log(action);
+            }
+
+            clear() {
+                this.expression = '';
+                this.updateDisplay();
+                this.resultEl.textContent = '0';
+            }
+
+            backspace() {
+                this.expression = this.expression.slice(0, -1);
+                this.updateDisplay();
+            }
+
+            calculate() {
+                if (!this.expression.trim()) return;
+
+                try {
+                    let expr = this.expression
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\^/g, '^');
+
+                    const result = math.evaluate(expr);
+
+                    if (!isFinite(result) || isNaN(result)) {
+                        this.resultEl.textContent = 'Error';
+                    } else {
+                        const formattedResult = Math.round(result * 1e10) / 1e10;
+                        this.resultEl.textContent = formattedResult;
+
+                        // Add to history
+                        this.historyManager.addEntry(this.expression, formattedResult.toString());
+
+                        this.expression = result.toString();
+                    }
+                } catch (error) {
+                    this.resultEl.textContent = 'Error';
+                }
+            }
+
+            updateDisplay() {
+                this.expressionEl.textContent = this.expression || '';
+            }
+
+            // History Functions
+            openHistory() {
+                this.historyPanel.classList.remove('-translate-x-full');
+                this.historyOverlay.classList.remove('pointer-events-none', 'opacity-0');
+                this.historyOverlay.classList.add('opacity-100');
+                this.renderHistory();
+            }
+
+            closeHistory() {
+                this.historyPanel.classList.add('-translate-x-full');
+                this.historyOverlay.classList.add('pointer-events-none', 'opacity-0');
+                this.historyOverlay.classList.remove('opacity-100');
+            }
+
+            renderHistory() {
+                const history = this.historyManager.getAll();
+                const emptyState = document.getElementById('emptyHistory');
+
+                if (history.length === 0) {
+                    emptyState.style.display = 'flex';
+                    // Clear any existing history items
+                    const historyItems = this.historyContent.querySelectorAll('.history-item');
+                    historyItems.forEach(item => item.remove());
+                    return;
+                }
+
+                emptyState.style.display = 'none';
+
+                // Clear existing items
+                const existingItems = this.historyContent.querySelectorAll('.history-item');
+                existingItems.forEach(item => item.remove());
+
+                // Render history items
+                history.forEach(entry => {
+                    const item = this.createHistoryItem(entry);
+                    this.historyContent.insertBefore(item, emptyState);
+                });
+            }
+
+            createHistoryItem(entry) {
+                const div = document.createElement('div');
+                div.className = 'history-item p-3 rounded-lg bg-gray-50 dark:bg-[#1E232F] hover:bg-gray-100 dark:hover:bg-[#2a303e] transition-colors cursor-pointer group';
+
+                div.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="flex-1" onclick="app.reuseExpression('${entry.expression.replace(/'/g, "\\'")}', '${entry.result}')">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">${entry.expression}</div>
+              <div class="text-lg font-bold text-gray-900 dark:text-white">= ${entry.result}</div>
+            </div>
+            <button onclick="app.deleteHistoryItem(${entry.id}); event.stopPropagation();" class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600 p-1">
+              <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+            </button>
+          </div>
+          <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">${this.formatTimestamp(entry.timestamp)}</div>
+        `;
+
+                return div;
+            }
+
+            formatTimestamp(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = now - date;
+
+                // Less than 1 minute
+                if (diff < 60000) {
+                    return '방금 전';
+                }
+                // Less than 1 hour
+                if (diff < 3600000) {
+                    const minutes = Math.floor(diff / 60000);
+                    return `${minutes}분 전`;
+                }
+                // Less than 1 day
+                if (diff < 86400000) {
+                    const hours = Math.floor(diff / 3600000);
+                    return `${hours}시간 전`;
+                }
+                // Show date
+                return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            reuseExpression(expression, result) {
+                this.expression = expression;
+                this.resultEl.textContent = result;
+                this.updateDisplay();
+                this.closeHistory();
+            }
+
+            deleteHistoryItem(id) {
+                this.historyManager.deleteEntry(id);
+                this.renderHistory();
+            }
+
+            clearHistory() {
+                if (confirm('모든 계산 기록을 삭제하시겠습니까?')) {
+                    this.historyManager.clear();
+                    this.renderHistory();
+                }
+            }
+        }
+
+        const app = new CalculatorApp();
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (/^[0-9.]$/.test(e.key)) {
+                app.appendNumber(e.key);
+                e.preventDefault();
+            } else if (['+', '-', '*', '/'].includes(e.key)) {
+                app.appendOperator(e.key);
+                e.preventDefault();
+            } else if (e.key === 'Enter') {
+                app.calculate();
+                e.preventDefault();
+            } else if (e.key === 'Escape') {
+                app.clear();
+                e.preventDefault();
+            } else if (e.key === 'Backspace') {
+                app.backspace();
+                e.preventDefault();
+            } else if (e.key === '(' || e.key === ')') {
+                app.appendNumber(e.key);
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+
+</html>
+```
