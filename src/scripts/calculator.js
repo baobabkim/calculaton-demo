@@ -113,7 +113,6 @@ export class Calculator {
         // Check for double operators (e.g., "2 + + 3")
         for (let i = 0; i < expr.length - 1; i++) {
             const current = expr[i];
-            const next = expr[i + 1];
 
             // Skip if current is not an operator
             if (!operators.includes(current)) continue;
