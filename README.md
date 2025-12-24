@@ -2,7 +2,7 @@
 
 > **현대적인 웹 기술과 소프트웨어 공학 원칙을 적용한 고품질 계산기 애플리케이션**
 
-[![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://baobabkims.github.io/calculaton-demo/)
+[![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://baobabkim.github.io/calculaton-demo/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen)](docs/TECH_SPEC.md)
 
@@ -10,7 +10,7 @@
 
 **지금 바로 사용해보세요!**
 
-🔗 **[계산기 실행하기](https://baobabkims.github.io/calculaton-demo/calculator-standalone.html)**
+🔗 **[계산기 실행하기](https://baobabkim.github.io/calculaton-demo/calculator-standalone.html)**
 
 - ✅ 빌드 없이 바로 실행 가능
 - ✅ 모든 기능 완전 작동
@@ -327,7 +327,7 @@ calculaton-demo/
 **가장 빠른 방법**: 브라우저에서 바로 실행
 
 1. `calculator-standalone.html` 파일을 브라우저에서 열기
-2. 또는 [라이브 데모](https://baobabkims.github.io/calculaton-demo/calculator-standalone.html) 접속
+2. 또는 [라이브 데모](https://baobabkim.github.io/calculaton-demo/calculator-standalone.html) 접속
 
 ### 개발 환경 설정
 
@@ -339,7 +339,7 @@ calculaton-demo/
 
 ```bash
 # 저장소 클론
-git clone https://github.com/baobabkims/calculaton-demo.git
+git clone https://github.com/baobabkim/calculaton-demo.git
 cd calculaton-demo
 
 # 의존성 설치
@@ -500,7 +500,7 @@ graph LR
 - 🎓 대학생 (컴퓨터공학 전공)
 - 💼 취업 포트폴리오 프로젝트
 - 📧 [이메일 주소]
-- 🔗 [GitHub](https://github.com/baobabkims)
+- 🔗 [GitHub](https://github.com/baobabkim)
 - 🔗 [LinkedIn](링크)
 
 ---
